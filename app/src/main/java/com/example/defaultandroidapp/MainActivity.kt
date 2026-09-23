@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 class MainActivity : ComponentActivity() {
 
     private lateinit var webView: WebView
+    private lateinit var ttsBridge: TtsBridge
 
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
 
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -66,7 +67,16 @@ class MainActivity : ComponentActivity() {
             domStorageEnabled = true
             allowFileAccess = true
             allowContentAccess = true
+            mediaPlaybackRequiresUserGesture = false
         }
+
+        /*
+         * Native text-to-speech for the web app.
+         * The WebView has no speechSynthesis, so the web app calls
+         * window.AndroidTTS.speak(text, lang) instead.
+         */
+        ttsBridge = TtsBridge(this)
+        webView.addJavascriptInterface(ttsBridge, "AndroidTTS")
 
         webView.webViewClient = WebViewClient()
 
@@ -102,12 +112,11 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        /*
-         * Use the actual deployed website URL here.
-         *
-         * Do not combine a website URL with a GitHub URL.
-         */
-        webView.loadUrl("https://metur100.github.io/Learning.App")
+        if (savedInstanceState != null) {
+            webView.restoreState(savedInstanceState)
+        } else {
+            webView.loadUrl("https://metur100.github.io/Dinobot.Academy/")
+        }
 
         setContentView(webView)
 
@@ -125,6 +134,12 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    override fun onPause() {
+        // Stop talking when the app goes to the background
+        ttsBridge.stop()
+        super.onPause()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         webView.saveState(outState)
         super.onSaveInstanceState(outState)
@@ -133,6 +148,8 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         filePathCallback?.onReceiveValue(null)
         filePathCallback = null
+
+        ttsBridge.shutdown()
 
         webView.loadUrl("about:blank")
         webView.stopLoading()

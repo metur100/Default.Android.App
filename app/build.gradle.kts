@@ -10,7 +10,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.example.learningapp"
+        applicationId = "com.example.dino"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
