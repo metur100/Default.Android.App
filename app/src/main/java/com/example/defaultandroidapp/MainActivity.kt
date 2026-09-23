@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
          *
          * Do not combine a website URL with a GitHub URL.
          */
-        webView.loadUrl("https://logistic-management-ui.pages.dev/")
+        webView.loadUrl("https://metur100.github.io/Learning.App")
 
         setContentView(webView)
 
