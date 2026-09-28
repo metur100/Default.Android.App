@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -20,13 +21,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DefaultAndroidApp">
 
+        <!-- Android 16: keep the landscape lock on tablets and foldables too (temporary opt-out). -->
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
+
+        <!-- The game is played in landscape only; it still flips 180° when the phone is turned around. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:label="@string/app_name"
             android:theme="@style/Theme.DefaultAndroidApp"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
