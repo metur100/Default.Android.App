@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
@@ -21,7 +20,6 @@ import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import kotlin.math.abs
 
 private const val GAME_URL = "https://metur100.github.io/Starfall.Grove/"
 
@@ -39,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        steadyPerformance()
+        fastScreen()
 
         // Debug builds only: lets Chrome on a PC (chrome://inspect) profile the game running on the phone.
         if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) WebView.setWebContentsDebuggingEnabled(true)
@@ -116,24 +114,21 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Even speed instead of fast-then-slow when the phone heats up, the screen kept on, and 60 Hz on fast screens. */
-    private fun steadyPerformance() {
+    /** The screen kept on, and the fastest refresh rate the screen has (90/120 Hz), like in Chrome. */
+    private fun fastScreen() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val power = getSystemService(POWER_SERVICE) as PowerManager
-            if (power.isSustainedPerformanceModeSupported) window.setSustainedPerformanceMode(true)
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             @Suppress("DEPRECATION") val display = windowManager.defaultDisplay
             val now = display.mode
-            val sixty = display.supportedModes
-                .filter { it.physicalWidth == now.physicalWidth && it.physicalHeight == now.physicalHeight && it.refreshRate >= 58f }
-                .minByOrNull { abs(it.refreshRate - 60f) }
-            window.attributes = window.attributes.apply {
-                if (sixty != null) preferredDisplayModeId = sixty.modeId
-                preferredRefreshRate = 60f
+            val fastest = display.supportedModes
+                .filter { it.physicalWidth == now.physicalWidth && it.physicalHeight == now.physicalHeight }
+                .maxByOrNull { it.refreshRate }
+            if (fastest != null) {
+                window.attributes = window.attributes.apply {
+                    preferredDisplayModeId = fastest.modeId
+                    preferredRefreshRate = fastest.refreshRate
+                }
             }
         }
     }
