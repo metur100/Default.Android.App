@@ -10,7 +10,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.example.starfallgrove"
+        applicationId = "com.certidevelopment.starfallminirift"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

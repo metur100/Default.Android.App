@@ -21,7 +21,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 
-private const val GAME_URL = "https://metur100.github.io/Starfall.Grove/"
+private const val GAME_URL = "https://metur100.github.io/Starfall.Grove.Moba.UI/"
 
 class MainActivity : ComponentActivity() {
 
@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
 
         webView = createWebView()
         setContentView(webView)
+        window.setBackgroundDrawable(null) // the game covers the whole screen: don't also paint the window under it every frame
         hideSystemUI()
 
         // Only load the page when there is no saved state to restore.
